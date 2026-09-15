@@ -30,6 +30,7 @@ Taskfile.yml         команды для локального запуска �
   - graceful shutdown по `SIGTERM`: readiness выключается, пауза `SHUTDOWN_DRAIN_DELAY`, затем остановка серверов с таймаутом и принудительным закрытием соединений.
 - **Миграции** — golang-migrate, файлы в `services/auth/migrations`.
 - **Конфигурация** — только переменные окружения, разбитые по секциям в `internal/config`.
+- **Unit-тесты** на бизнес-логику регистрации (`internal/application`): валидация и нормализация входных данных, порядок шагов, остановка при ошибках зависимостей, генерация кода подтверждения.
 
 ### Библиотека `pkg/observability`
 
@@ -92,6 +93,7 @@ minikube delete                                           # удалить са�
 ## Разработка
 
 ```sh
-cd services/auth && task lint   # то же для pkg/observability
+cd services/auth && task test   # то же для pkg/observability
+cd services/auth && task lint
 cd services/auth && task fmt
 ```

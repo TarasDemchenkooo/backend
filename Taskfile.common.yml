@@ -26,3 +26,8 @@ tasks:
     deps: [install-lint]
     cmds:
       - '{{.GOLANGCI_BIN}} fmt ./...'
+
+  test:
+    desc: Run the module tests
+    cmds:
+      - go test ./...
