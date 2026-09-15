@@ -1,0 +1,4 @@
+{{ include "service.fullname" . }} {{ include "service.imageTag" . }} is deployed to {{ .Release.Namespace }}.
+
+API:     kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "service.fullname" . }} 8080:{{ .Values.service.port }}
+Admin:   kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "service.fullname" . }} 9090:{{ .Values.ports.admin }}

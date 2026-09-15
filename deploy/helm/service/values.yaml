@@ -1,0 +1,99 @@
+fullnameOverride: ""
+
+replicaCount: 2
+
+image:
+  repository: ""
+  tag: ""
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+ports:
+  http: 8080
+  admin: 9090
+
+env: {}
+
+secret:
+  create: false
+  existingSecret: ""
+  data: {}
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    memory: 256Mi
+
+goMemLimitPercent: 90
+
+terminationGracePeriodSeconds: 40
+
+rollingUpdate:
+  maxSurge: 1
+  maxUnavailable: 0
+
+livenessProbe:
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+readinessProbe:
+  periodSeconds: 2
+  timeoutSeconds: 3
+  failureThreshold: 2
+
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 70
+
+topologySpread:
+  enabled: true
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  host: ""
+  path: /
+  tls: []
+
+migrations:
+  enabled: false
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+  path: /migrations
+  databaseUrlKey: POSTGRES_DSN
+  backoffLimit: 1
+  activeDeadlineSeconds: 300
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+    limits:
+      memory: 128Mi
+
+metrics:
+  serviceMonitor:
+    enabled: false
+    interval: 30s
+    labels: {}
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

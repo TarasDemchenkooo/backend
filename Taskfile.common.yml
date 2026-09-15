@@ -1,0 +1,28 @@
+version: '3'
+
+vars:
+  BIN_DIR: '{{.TASKFILE_DIR}}/bin'
+  GOLANGCI_VERSION: 'v2.13.2'
+  GOLANGCI_BIN: '{{.BIN_DIR}}/golangci-lint{{exeExt}}'
+
+tasks:
+  install-lint:
+    desc: Install golangci-lint
+    internal: true
+    status:
+      - test -f '{{.GOLANGCI_BIN}}'
+    cmds:
+      - mkdir -p '{{.BIN_DIR}}'
+      - curl -sSfL https://golangci-lint.run/install.sh | sh -s -- -b '{{.BIN_DIR}}' {{.GOLANGCI_VERSION}}
+
+  lint:
+    desc: Lint the module
+    deps: [install-lint]
+    cmds:
+      - '{{.GOLANGCI_BIN}} run ./...'
+
+  fmt:
+    desc: Format the module
+    deps: [install-lint]
+    cmds:
+      - '{{.GOLANGCI_BIN}} fmt ./...'

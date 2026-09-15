@@ -1,0 +1,27 @@
+image:
+  repository: auth
+
+migrations:
+  enabled: true
+  image:
+    repository: auth-migrations
+
+env:
+  OTEL_SERVICE_NAME: auth
+  APP_ENV: production
+  LOG_LEVEL: info
+  LOG_FORMAT: json
+  TRACING_ENABLED: true
+  OTEL_EXPORTER_OTLP_ENDPOINT: otel-collector.observability.svc:4317
+  OTEL_EXPORTER_OTLP_INSECURE: true
+  OTEL_TRACES_SAMPLER_ARG: 0.1
+  REDIS_ADDR: redis:6379
+  REDIS_DB: 0
+  STARTUP_TIMEOUT: 15s
+  SHUTDOWN_DRAIN_DELAY: 5s
+  SHUTDOWN_TIMEOUT: 15s
+  VERIFICATION_CODE_TTL: 15m
+  BCRYPT_COST: 10
+
+secret:
+  existingSecret: auth

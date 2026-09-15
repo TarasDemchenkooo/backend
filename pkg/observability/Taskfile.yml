@@ -1,0 +1,6 @@
+version: '3'
+
+includes:
+  common:
+    taskfile: ../../Taskfile.common.yml
+    flatten: true

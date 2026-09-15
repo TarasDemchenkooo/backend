@@ -1,0 +1,23 @@
+postgres:
+  image: postgres:18-alpine
+  user: postgres
+  password: postgres
+  databases:
+    - auth
+  storage: 1Gi
+  storageClassName: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      memory: 512Mi
+
+redis:
+  image: redis:8-alpine
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      memory: 256Mi

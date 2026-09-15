@@ -1,0 +1,71 @@
+version: '3'
+
+vars:
+  NAMESPACE: backend
+  SERVICES: auth
+
+tasks:
+  minikube:start:
+    desc: Start the local minikube cluster
+    cmds:
+      - minikube start --driver=docker --cpus=2 --memory=3g
+
+  infra:up:
+    desc: Deploy Postgres and Redis for local development
+    cmds:
+      - helm upgrade --install dev-infra deploy/helm/dev-infra --namespace {{.NAMESPACE}} --create-namespace --wait --timeout 5m
+
+  service:image:
+    desc: Build the app and migrations images of SERVICE and load them into minikube
+    requires:
+      vars: [SERVICE, TAG]
+    cmds:
+      - docker build -f services/{{.SERVICE}}/Dockerfile --target app -t {{.SERVICE}}:{{.TAG}} .
+      - docker build -f services/{{.SERVICE}}/Dockerfile --target migrations -t {{.SERVICE}}-migrations:{{.TAG}} .
+      - minikube image load {{.SERVICE}}:{{.TAG}}
+      - minikube image load {{.SERVICE}}-migrations:{{.TAG}}
+
+  service:deploy:
+    desc: Build SERVICE and deploy it to minikube, e.g. task service:deploy SERVICE=auth
+    requires:
+      vars: [SERVICE]
+    vars:
+      TAG: 'dev-{{now | unixEpoch}}'
+    cmds:
+      - task: service:image
+        vars:
+          SERVICE: '{{.SERVICE}}'
+          TAG: '{{.TAG}}'
+      - >-
+        helm upgrade --install {{.SERVICE}} deploy/helm/service
+        --namespace {{.NAMESPACE}} --create-namespace
+        -f services/{{.SERVICE}}/deploy/values.yaml
+        -f services/{{.SERVICE}}/deploy/values.minikube.yaml
+        --set image.tag={{.TAG}}
+        --wait --timeout 5m
+
+  up:
+    desc: Deploy the infrastructure and every service to minikube
+    cmds:
+      - task: infra:up
+      - for:
+          var: SERVICES
+        task: service:deploy
+        vars:
+          SERVICE: '{{.ITEM}}'
+
+  down:
+    desc: Remove everything deployed to minikube
+    cmds:
+      - for:
+          var: SERVICES
+        cmd: helm uninstall {{.ITEM}} --namespace {{.NAMESPACE}} --ignore-not-found
+      - helm uninstall dev-infra --namespace {{.NAMESPACE}} --ignore-not-found
+      - kubectl delete namespace {{.NAMESPACE}} --ignore-not-found
+
+  service:forward:
+    desc: Forward the API to localhost:8080 and the admin port to localhost:9090
+    requires:
+      vars: [SERVICE]
+    cmds:
+      - kubectl --namespace {{.NAMESPACE}} port-forward svc/{{.SERVICE}} 8080:80 9090:9090

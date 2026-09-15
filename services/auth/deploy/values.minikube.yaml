@@ -1,0 +1,32 @@
+replicaCount: 1
+
+image:
+  pullPolicy: Never
+
+migrations:
+  image:
+    pullPolicy: Never
+
+env:
+  APP_ENV: local
+  LOG_LEVEL: debug
+  TRACING_ENABLED: false
+  OTEL_TRACES_SAMPLER_ARG: 1
+  REDIS_ADDR: dev-infra-redis:6379
+
+secret:
+  create: true
+  existingSecret: ""
+  data:
+    POSTGRES_DSN: postgres://postgres:postgres@dev-infra-postgres:5432/auth?sslmode=disable
+    REDIS_PASSWORD: ""
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    memory: 128Mi
+
+topologySpread:
+  enabled: false

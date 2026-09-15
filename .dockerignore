@@ -1,0 +1,7 @@
+*
+!pkg
+!services
+**/bin
+**/deploy
+**/Taskfile.yml
+**/*_test.go
